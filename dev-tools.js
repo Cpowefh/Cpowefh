@@ -7,7 +7,7 @@ const devToolsCode = `
             initGame();
         } else {
             localStorage.setItem('unlockedLevel', config.maxLevel);
-            alert('🎉 恭喜通关！');
+            alert('🎉 已使用开发者工具通关！');
             initGame();
         }
     }
