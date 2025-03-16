@@ -2,8 +2,9 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>代码迷宫 - 程序员解密游戏</title>
+    <title>代码迷宫 - 程序员挑战</title>
     <style>
+        /* 你的 CSS 样式保持不变 */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f7f1e3;
@@ -114,7 +115,7 @@
             font-style: italic;
         }
 
-        #reset-button, #dev-tools-button {
+        #dev-tools-button {
             background: #e67e22;
             color: #fff;
             border: none;
@@ -127,12 +128,12 @@
             margin: 0 auto 20px;
         }
 
-        #reset-button:hover, #dev-tools-button:hover {
+        #dev-tools-button:hover {
             background: #d35400;
             transform: translateY(-2px);
         }
 
-        #reset-button:active, #dev-tools-button:active {
+        #dev-tools-button:active {
             transform: translateY(0);
         }
 
@@ -190,11 +191,11 @@
 </head>
 <body>
     <h1>🖥️ 代码迷宫 - 程序员挑战 🚀</h1>
-    <button id="reset-button" onclick="resetProgress()">重置进度</button>
     <button id="dev-tools-button" style="display: none;" onclick="skipLevel()">开发者测试工具</button>
 
     <div id="level-select"></div>
 
+    <!-- 关卡内容 -->
     <div id="level1" class="container level">
         <h2>第一关：源代码的秘密</h2>
         <p>找到隐藏在网页源代码中的密码</p>
@@ -268,52 +269,46 @@ console.log(4);
             maxLevel: 5,
             answers: ['SOURCE_CODE', '24', 'P455W0RD', 'ABC-1234', '1,4,2,3'],
             defaultLevel: 1,
-            devPassword: btoa('@gby2015')
+            devPassword: btoa('@gby2015') // 开发者密码（Base64 编码）
         };
 
-        function resetProgress() {
-            localStorage.removeItem('unlockedLevel');
-            alert('进度已重置！');
-            initGame();
-        }
+        let currentLevel = config.defaultLevel; // 当前关卡
 
+        // 初始化游戏
         function initGame() {
             generateLevelSelect();
-            const savedLevel = Math.min(
-                parseInt(localStorage.getItem('unlockedLevel')) || config.defaultLevel,
-                config.maxLevel
-            );
-            showLevel(savedLevel);
+            showLevel(currentLevel);
         }
 
+        // 生成关卡选择按钮
         function generateLevelSelect() {
             const container = document.getElementById('level-select');
             container.innerHTML = '';
-            
-            const unlocked = parseInt(localStorage.getItem('unlockedLevel')) || config.defaultLevel;
-            
+
             for (let i = 1; i <= config.maxLevel; i++) {
                 const btn = document.createElement('div');
-                btn.className = `level-btn ${i > unlocked ? 'locked' : ''}`;
+                btn.className = `level-btn ${i > currentLevel ? 'locked' : ''}`;
                 btn.textContent = `关卡 ${i}`;
-                
-                if (i <= unlocked) {
+
+                if (i <= currentLevel) {
                     btn.addEventListener('click', () => {
                         showLevel(i);
                         updateButtonStates(i);
                     });
                 }
-                
+
                 container.appendChild(btn);
             }
         }
 
+        // 显示指定关卡
         function showLevel(level) {
             document.querySelectorAll('.level').forEach(el => el.classList.remove('active'));
             const target = document.getElementById(`level${level}`);
             if (target) target.classList.add('active');
         }
 
+        // 更新按钮状态
         function updateButtonStates(activeLevel) {
             document.querySelectorAll('.level-btn').forEach(btn => {
                 const btnLevel = parseInt(btn.textContent.split(' ')[1]);
@@ -322,17 +317,18 @@ console.log(4);
             });
         }
 
+        // 检查答案
         function checkAnswer(level) {
             const input = document.getElementById(`answer${level}`);
             const userAnswer = input.value.trim();
-            
+
             if (userAnswer === config.answers[level - 1]) {
                 const newLevel = Math.min(level + 1, config.maxLevel);
-                localStorage.setItem('unlockedLevel', newLevel);
-                
+                currentLevel = newLevel;
+
                 alert('✅ 正确！' + (level < config.maxLevel ? '解锁下一关！' : '恭喜通关！'));
                 input.value = '';
-                
+
                 generateLevelSelect();
                 showLevel(newLevel);
                 updateButtonStates(newLevel);
@@ -342,16 +338,19 @@ console.log(4);
             }
         }
 
+        // 打开密码验证模态框
         function openPasswordModal() {
             document.getElementById('overlay').style.display = 'block';
             document.getElementById('password-modal').style.display = 'block';
         }
 
+        // 关闭模态框
         function closeModal() {
             document.getElementById('overlay').style.display = 'none';
             document.getElementById('password-modal').style.display = 'none';
         }
 
+        // 验证密码
         function verifyPassword() {
             const input = document.getElementById('password-input');
             const encryptedInput = btoa(input.value);
@@ -366,29 +365,22 @@ console.log(4);
             }
         }
 
+        // 跳过关卡
         function skipLevel() {
-            const currentLevel = parseInt(localStorage.getItem('unlockedLevel')) || config.defaultLevel;
             if (currentLevel < config.maxLevel) {
-                localStorage.setItem('unlockedLevel', currentLevel + 1);
+                currentLevel++;
                 alert('已跳过当前关卡！');
                 initGame();
             } else {
-                localStorage.setItem('unlockedLevel', config.maxLevel);
                 alert('🎉 已使用开发者工具通关！');
                 initGame();
             }
         }
 
+        // 初始化游戏
         window.onload = initGame;
 
-        document.addEventListener('keydown', (e) => {
-            if (e.shiftKey && e.key === 'F12') {
-                e.preventDefault();
-                openPasswordModal();
-            }
-        });
+        
     </script>
-
-    <!-- 密码是：SOURCE_CODE -->
 </body>
 </html>
