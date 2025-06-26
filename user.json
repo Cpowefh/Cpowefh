@@ -1,1 +1,3 @@
-{}
+{
+  "user": "<div style=\"background-image:url('javascript:alert(\\\"XSS via CSS\\\")')\"></div>"
+}
